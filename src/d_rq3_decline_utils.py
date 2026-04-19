@@ -19,18 +19,21 @@ POSITION_PALETTE = {
 # Peak data
 def extract_peak_per_player(backbone: pd.DataFrame) -> pd.DataFrame:
     """
-    For each player, return peak_age (mean when tied) and peak_value (max when tied).
-    Only considers rows where market_value_rank_desc = 1, the peak.
+    For each player, return the earliest observation where market value reaches
+    its maximum, using the precomputed is_peak_value_obs flag — consistent with
+    B's compute_peak_age_optimized. Sorting by market_value_date before
+    groupby.first() ensures tied-peak players contribute their earliest peak date.
     """
     peak = (
-        backbone[backbone["market_value_rank_desc"] == 1]
-        .sort_values(["player_id", "age_years"])
+        backbone.loc[backbone["is_peak_value_obs"].fillna(False)]
+        .sort_values(["player_id", "market_value_date"])
         .groupby("player_id", as_index=False)
-        .agg(
-            peak_age=("age_years", "mean"), # mean handles ties: if two obs share rank=1, average their ages
-            peak_value=("market_value_eur", "max"),
-            broad_position=("broad_position", "first") 
-        )
+        .first()
+        .rename(columns={
+            "age_years": "peak_age",
+            "market_value_eur": "peak_value",
+        })
+        [["player_id", "peak_age", "peak_value", "broad_position"]]
     )
     return peak
 
