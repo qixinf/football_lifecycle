@@ -1,0 +1,6 @@
+broad_position,n_players,mean_perf,median_perf,mean_age,median_age
+Defender,19205,3.664,3.0,23.895,23.302
+Forward,15917,11.861,11.0,23.901,23.291
+Goalkeeper,6219,0.201,0.0,22.322,20.739
+Midfielder,17441,6.926,5.0,23.789,23.113
+Other,0,,,,
