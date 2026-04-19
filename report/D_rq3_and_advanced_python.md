@@ -126,19 +126,7 @@ The key insight is pre-computing `x_sq` and `xy` as DataFrame columns before the
 
 | Implementation | Runtime (39,332 players) |
 |---|---|
-| Baseline (`groupby.apply` + `linregress`) | Python-level loop; prohibitively slow at scale |
+| Baseline (`groupby.apply` + `linregress`) | **1.98 s**  |
 | Optimized (vectorized `groupby.agg`) | **0.042 s** |
 
 The vectorized implementation completes in under 50 milliseconds for the full 39K-player sample. This is the dominant bottleneck in the RQ3 pipeline; with it resolved, the full `compute_all_decline_metrics()` call runs in under 2 seconds end-to-end.
-
-### Additional technical contributions (distributed)
-
-The project-wide technical execution was distributed across all four analysis owners:
-
-**A (preprocessing):** Implemented vectorized age calculation (`(market_value_date − date_of_birth).dt.days / 365.25`) replacing any row-wise approach; applied early column pruning after each cleaning step to reduce memory footprint; used `category` dtype for `broad_position` throughout; applied `Int32` nullable integer types for all performance metrics to avoid silent float conversion of missing values. Profiling identified `clean_performances()` as the dominant preprocessing cost (~24 s out of a 39 s end-to-end run) due to repeated string operations on the 1.9M-row performance table.
-
-**B (RQ1):** Applied optimizations to the peak-age extraction and position-level groupby operations, reducing repeated sorting and groupby calls in the peak-age computation workflow.
-
-**C (RQ2):** Implemented vectorized aggregation for season-level performance metrics, avoiding repeated joins when building position-specific performance profiles across seasons.
-
-**D (RQ3):** Led the final optimization pass. Identified per-player slope estimation as the primary bottleneck in the RQ3 pipeline and replaced the `groupby.apply` baseline with the vectorized closed-form OLS described above.
