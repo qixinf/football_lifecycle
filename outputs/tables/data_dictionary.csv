@@ -1,0 +1,27 @@
+dataset,column_name,description,dtype
+player_profiles_clean.parquet,player_id,Player identifier,string
+player_profiles_clean.parquet,player_name,Player display name,string
+player_profiles_clean.parquet,date_of_birth,Date of birth,datetime64[ns]
+player_profiles_clean.parquet,raw_position,Original position field from source,string
+player_profiles_clean.parquet,raw_sub_position,Original sub-position field if present,string
+player_profiles_clean.parquet,broad_position,"Mapped broad group: Goalkeeper, Defender, Midfielder, Forward, Other",category
+player_market_value_clean.parquet,player_id,Player identifier,string
+player_market_value_clean.parquet,market_value_date,Date of market value observation,datetime64[ns]
+player_market_value_clean.parquet,market_value_eur,Market value in euros,float64
+player_performances_clean.parquet,player_id,Player identifier,string
+player_performances_clean.parquet,season,Season label from source,string
+player_performances_clean.parquet,season_start_year,Parsed first year of season,Int32
+player_performances_clean.parquet,minutes_played,Minutes played,Int32
+player_performances_clean.parquet,goals,Goals scored,Int32
+player_performances_clean.parquet,assists,Assists,Int32
+player_performances_clean.parquet,clean_sheets,Clean sheets,Int32
+player_lifecycle_backbone.parquet,player_id,Player identifier,string
+player_lifecycle_backbone.parquet,market_value_date,Date of market value observation,datetime64[ns]
+player_lifecycle_backbone.parquet,market_value_eur,Market value in euros,float64
+player_lifecycle_backbone.parquet,date_of_birth,Date of birth,datetime64[ns]
+player_lifecycle_backbone.parquet,age_days,Age in days at market value date,float64
+player_lifecycle_backbone.parquet,age_years,Age in years at market value date,float64
+player_lifecycle_backbone.parquet,broad_position,Mapped broad position group,category
+player_lifecycle_backbone.parquet,n_market_value_obs,Number of market value observations for player,Int32
+player_lifecycle_backbone.parquet,is_peak_value_obs,Whether this row is tied for player peak market value,bool
+player_lifecycle_backbone.parquet,market_value_rank_desc,Dense descending rank of market value within each player career history,Int32
