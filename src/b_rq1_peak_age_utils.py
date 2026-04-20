@@ -44,6 +44,23 @@ def compute_peak_age(df: pd.DataFrame) -> pd.DataFrame:
     peak = peak[peak["broad_position"].isin(VALID_POSITIONS)].copy()
     return peak
 
+def compute_peak_age_naive(data):
+    out = (
+        data.sort_values(["player_id", "market_value_date"])
+            .groupby("player_id", observed=True)
+            .apply(lambda x: x.loc[x["market_value_eur"].eq(x["market_value_eur"].max())].iloc[0])
+            .reset_index(drop=True)
+    )
+    return out
+
+def compute_peak_age_optimized(data):
+    peak = (
+        data.loc[data["is_peak_value_obs"].fillna(False)]
+            .sort_values(["player_id", "market_value_date"])
+    )
+    out = peak.groupby("player_id", observed=True).first().reset_index()
+    return out
+
 def summarize_peak_age(peak_df: pd.DataFrame) -> pd.DataFrame:
     summary = (
         peak_df.groupby("broad_position", observed=True)["peak_age"]

@@ -1,0 +1,5 @@
+Stage,Naive (s),Optimized (s),Speedup
+peak age,12.304,0.072,171.2
+peak performance,1.617,0.43,3.8
+decline rate,2.702,0.473,5.7
+Total,16.623,0.975,17.0

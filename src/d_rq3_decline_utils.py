@@ -115,9 +115,42 @@ def compute_decline_slopes_base(post_peak: pd.DataFrame) -> pd.DataFrame:
     )
     return slopes.merge(counts, on="player_id")
 
+def d_pipeline_naive(
+    backbone: pd.DataFrame,
+    min_post_peak_obs: int = 3,
+) -> tuple:
+    """
+    Full pipeline with non-optimized slope computation
+    """
+    peak_per_player = extract_peak_per_player(backbone)
+    post_peak = extract_post_peak_data(backbone, peak_per_player)
+
+    n_post = post_peak.groupby("player_id").size()
+    eligible = n_post[n_post >= min_post_peak_obs].index
+    post_peak_filtered = post_peak[post_peak["player_id"].isin(eligible)].copy()
+
+    slopes = compute_decline_slopes_base(post_peak_filtered)
+
+    last_obs = (
+        post_peak_filtered
+        .sort_values("age_years")
+        .groupby("player_id", as_index=False)
+        .last()[["player_id", "value_ratio", "age_years"]]
+        .rename(columns={"value_ratio": "final_value_ratio", "age_years": "last_obs_age"})
+    )
+
+    decline_df = (
+        peak_per_player
+        .merge(slopes, on="player_id", how="inner")
+        .merge(last_obs, on="player_id", how="left")
+        .dropna(subset=["decline_slope"])
+    )
+    decline_df["decline_pct_per_year"] = (np.exp(decline_df["decline_slope"]) - 1) * 100
+    decline_df["broad_position"] = decline_df["broad_position"].astype("category")
+    return peak_per_player, post_peak_filtered, decline_df
 
 # Full pipeline
-def compute_all_decline_metrics(
+def d_pipeline_optimized(
     backbone: pd.DataFrame,
     min_post_peak_obs: int = 3,
 ) -> tuple:
