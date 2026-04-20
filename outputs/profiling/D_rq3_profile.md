@@ -4,13 +4,13 @@
 RQ3 decline slope computation over backbone (836,635 rows, 58,944 players).
 
 ## Runtime
-Full pipeline: 0.46s
+Full pipeline: 0.54s
 
 ## Bottleneck identified
 The per-player slope estimation is the core computation.  
-**Baseline** (`groupby.apply` + `scipy.stats.linregress`): 2.28s  
+**Baseline** (`groupby.apply` + `scipy.stats.linregress`): 2.24s  
 **Optimized** (vectorized closed-form OLS via groupby aggregations): 0.05s  
-**Speedup: 47.8x**
+**Speedup: 47.0x**
 
 ## Optimization strategy
 Replaced Python-level iteration (groupby.apply calling linregress per player) with
@@ -24,19 +24,19 @@ numpy/pandas vectorized paths.
 
 ## cProfile top functions
 ```
-         40269 function calls (39479 primitive calls) in 0.454 seconds
+         40269 function calls (39479 primitive calls) in 0.528 seconds
 
    Ordered by: cumulative time
    List reduced from 1050 to 20 due to restriction <20>
 
    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-        2    0.000    0.000    0.458    0.229 /Users/fqxin/Desktop/1019_Py/.venv/lib/python3.10/site-packages/IPython/core/interactiveshell.py:3543(run_code)
-        2    0.000    0.000    0.458    0.229 {built-in method builtins.exec}
-        1    0.022    0.022    0.454    0.454 /Users/fqxin/Desktop/1019_Py/football_lifecycle/src/d_rq3_decline_utils.py:120(compute_all_decline_metrics)
-        6    0.000    0.000    0.139    0.023 /Users/fqxin/Desktop/1019_Py/.venv/lib/python3.10/site-packages/pandas/core/groupby/groupby.py:1898(_agg_general)
-        6    0.000    0.000    0.139    0.023 /Users/fqxin/Desktop/1019_Py/.venv/lib/python3.10/site-packages/pandas/core/groupby/groupby.py:1964(_cython_agg_general)
-       27    0.000    0.000    0.135    0.005 /Users/fqxin/Desktop/1019_Py/.venv/lib/python3.10/site-packages/pandas/core/groupby/groupby.py:1978(array_func)
-       27    0.000    0.000    0.135    0.005 /Users/fqxin/Desktop/1019_Py/.venv/lib/python3.10/site-packages/pandas/core/groupby/ops.py:821(_cython_operation)
-        2    0.000    0.000    0.127    0.063 /Users/fqxin/Desktop/1019_Py/.venv/lib/python3.10/site-packages/pandas/core/internals/managers.py:1469(grouped_reduce)
-       26    0.000    0.000    0.127    0.005 /Users/fqxin/Desktop/1
+        2    0.000    0.000    0.538    0.269 /Users/fqxin/Desktop/1019_Py/.venv/lib/python3.10/site-packages/IPython/core/interactiveshell.py:3543(run_code)
+        2    0.000    0.000    0.538    0.269 {built-in method builtins.exec}
+        1    0.027    0.027    0.528    0.528 /Users/fqxin/Desktop/1019_Py/football_lifecycle/src/d_rq3_decline_utils.py:153(d_pipeline_optimized)
+        6    0.001    0.000    0.170    0.028 /Users/fqxin/Desktop/1019_Py/.venv/lib/python3.10/site-packages/pandas/core/groupby/groupby.py:1898(_agg_general)
+        6    0.000    0.000    0.169    0.028 /Users/fqxin/Desktop/1019_Py/.venv/lib/python3.10/site-packages/pandas/core/groupby/groupby.py:1964(_cython_agg_general)
+       27    0.000    0.000    0.166    0.006 /Users/fqxin/Desktop/1019_Py/.venv/lib/python3.10/site-packages/pandas/core/groupby/groupby.py:1978(array_func)
+       27    0.000    0.000    0.166    0.006 /Users/fqxin/Desktop/1019_Py/.venv/lib/python3.10/site-packages/pandas/core/groupby/ops.py:821(_cython_operation)
+        2    0.000    0.000    0.156    0.078 /Users/fqxin/Desktop/1019_Py/.venv/lib/python3.10/site-packages/pandas/core/internals/managers.py:1469(grouped_reduce)
+       26    0.000    0.000    0.156    0.006 /Users/fqxin/Desktop/1019_Py/
 ```
